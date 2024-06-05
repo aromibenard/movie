@@ -1,14 +1,22 @@
 'use client'
+import Clock from "@/components/Clock";
+import { ContentTab } from "@/components/ContentTab";
+import Loading from "@/components/Loading";
+import Nav, { NavProps } from "@/components/Nav";
+import { Button } from "@/components/ui/button";
 import { auth } from "@/firebase";
-import { onAuthStateChanged } from "firebase/auth";
+import { Avatar } from "@mui/material";
+import { ClockIcon } from "@radix-ui/react-icons";
+import { User, onAuthStateChanged } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function HomePage() {
 
     const [loading, setLoading] = useState(true)
-    const [userName, setUserName] = useState('');
-    // const [photoURL, setPhotoURL] = useState('');
+    const [userName, setUserName] = useState('')
+    const [photoURL, setPhotoURL] = useState('')
+    const [user, setUser] = useState<User | null>(null)
     const router = useRouter()
 
     useEffect(() => {
@@ -18,11 +26,14 @@ export default function HomePage() {
             router.push('/home')
     
             const user = auth.currentUser
-            const photoURL = user.photoURL
+            setUser(user)
+            const photoURL = user?.photoURL
             setUserName(user!.displayName!)
+            setPhotoURL(user?.photoURL || '')
             
     
           } else {
+            setUser(null)
             router.push('/auth/register');
           }
           setLoading(false)
@@ -32,12 +43,41 @@ export default function HomePage() {
         return () => unsubscribe();
       }, [router]);
     
-      // Render loading component if loading state is true
       if (loading) {
-        return 
+        return <Loading/>
       }
 
     return(
-        <div>hello {userName}</div>
+        <div>
+          <Nav userName={userName} photoURL={photoURL} user={user}/>
+          <Body userName={userName} photoURL={photoURL} user={user}/>
+        </div>
     )
 }
+
+//sub components
+const Body: React.FC<NavProps> = ({userName, photoURL}) => {
+  return (
+    <div className="h-dvh bg-slate-50 md:max-w-5xl mx-auto p-4">
+      <div className="grid md:grid-cols-3 gap-4 h-[15rem]">
+        <div className="bg-yellow-100 p-4 col-span-1 ">
+          <Avatar 
+            src={photoURL}
+            alt={userName}
+            sx={{height: 180, width: 180}}
+          />
+          <h2 className="m-3 font-semibold">{userName}</h2>
+          <div className="flex items-center space-x-2 m-3">
+            <ClockIcon className="text-2xl"/>
+            <Clock />
+          </div>
+          <Button className="mx-2">Edit Profile</Button>
+        </div>
+        <div className=" p-4 col-span-2">
+          <ContentTab />
+        </div>
+      </div>
+    </div>
+  )
+}
+
