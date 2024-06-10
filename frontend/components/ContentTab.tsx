@@ -15,8 +15,42 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs"
+import SearchBar from "./SearchBar"
+import React, { useState } from "react"
+import MovieSearchList from "./MovieSearchList"
 
 export function ContentTab() {
+
+  const [movies, setMovies] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const apiKey = process.env.NEXT_PUBLIC_TMDB_API_KEY
+
+  type Movie = {
+    id: number;
+    title: string;
+
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    fetch (`https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&query=${searchTerm}`)
+    .then (data => data.json())
+    .then (data => {
+      console.log(data)
+      setMovies(prevMovies => [...prevMovies, ...data.results]);
+    })
+
+  }
+
+  const handleChange = (e: React.FormEvent) => {
+    e.preventDefault()
+    setSearchTerm(e.target.value)
+
+  }
+
+
+
+
   return (
     <Tabs defaultValue="watchlist" className="w-full">
       <TabsList className="grid w-full grid-cols-2">
@@ -26,19 +60,21 @@ export function ContentTab() {
       <TabsContent value="watchlist">
         <Card>
           <CardHeader>
-            <CardTitle>Account</CardTitle>
+            <CardTitle></CardTitle>
             <CardDescription>
-              Make changes to your account here. Click save when youre done.
+              Search for movie here. Click Add to update your watchlist
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
             <div className="space-y-1">
-              <Label htmlFor="name">Name</Label>
-              <Input id="name" defaultValue="Pedro Duarte" />
+              <SearchBar 
+                searchTerm={searchTerm}
+                handleChange={handleChange}
+                handleSubmit={handleSubmit}
+              />
             </div>
             <div className="space-y-1">
-              <Label htmlFor="username">Username</Label>
-              <Input id="username" defaultValue="@peduarte" />
+              <MovieSearchList  movies = {movies}/>
             </div>
           </CardContent>
           <CardFooter>

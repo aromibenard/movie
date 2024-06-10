@@ -1,4 +1,5 @@
 'use client'
+
 import Clock from "@/components/Clock";
 import { ContentTab } from "@/components/ContentTab";
 import Loading from "@/components/Loading";
@@ -59,21 +60,22 @@ export default function HomePage() {
 const Body: React.FC<NavProps> = ({userName, photoURL}) => {
   return (
     <div className="h-dvh bg-slate-50 md:max-w-5xl mx-auto p-4">
-      <div className="grid md:grid-cols-3 gap-4 h-[15rem]">
-        <div className="bg-yellow-100 p-4 col-span-1 ">
+      <div className="grid md:grid-cols-4 gap-4 h-[15rem]">
+        <div className="bg-yellow-100 p-4 col-span-1">
           <Avatar 
             src={photoURL}
             alt={userName}
             sx={{height: 180, width: 180}}
+            className="flex mx-auto"
           />
-          <h2 className="m-3 font-semibold">{userName}</h2>
-          <div className="flex items-center space-x-2 m-3">
+          <h2 className="m-3 font-semibold flex mx-auto">{userName}</h2>
+          <div className="flex items-center space-x-2 m-3 mx-auto">
             <ClockIcon className="text-2xl"/>
             <Clock />
           </div>
-          <Button className="mx-2">Edit Profile</Button>
+          <Button className="flex mx-auto">Edit Profile</Button>
         </div>
-        <div className=" p-4 col-span-2">
+        <div className=" p-4 col-span-3">
           <ContentTab />
         </div>
       </div>
