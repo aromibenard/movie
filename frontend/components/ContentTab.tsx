@@ -18,11 +18,14 @@ import {
 import SearchBar from "./SearchBar"
 import React, { useState } from "react"
 import MovieSearchList from "./MovieSearchList"
+import Pagination from "./Pagination"
 
 export function ContentTab() {
 
   const [movies, setMovies] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [totalResults, setTotalResults ] = useState(0)
+  const [currentPage, setCurrentPage ] = useState(1)
   const apiKey = process.env.NEXT_PUBLIC_TMDB_API_KEY
 
   type Movie = {
@@ -31,24 +34,41 @@ export function ContentTab() {
 
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    fetch (`https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&query=${searchTerm}`)
-    .then (data => data.json())
-    .then (data => {
-      console.log(data)
-      setMovies(prevMovies => [...prevMovies, ...data.results]);
-    })
-
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const response = await fetch(
+        `https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&query=${searchTerm}`
+      );
+      const data = await response.json();
+      setMovies(data.results);
+      setTotalResults(data.total_results);
+      setCurrentPage(1); // Reset to first page on new search
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
   }
 
-  const handleChange = (e: React.FormEvent) => {
-    e.preventDefault()
-    setSearchTerm(e.target.value)
-
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    setSearchTerm(e.target.value);
   }
+  
 
+  const nextPage = async (pageNumber: number) => {
+    try {
+      const response = await fetch(
+        `https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&query=${searchTerm}&page=${pageNumber}`
+      );
+      const data = await response.json();
+      setMovies(data.results); // Set new movies, replacing old ones
+      setCurrentPage(pageNumber);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
 
+  const numberPages = Math.ceil(totalResults / 20 )
 
 
   return (
@@ -65,6 +85,7 @@ export function ContentTab() {
               Search for movie here. Click Add to update your watchlist
             </CardDescription>
           </CardHeader>
+          
           <CardContent className="space-y-2">
             <div className="space-y-1">
               <SearchBar 
@@ -73,12 +94,20 @@ export function ContentTab() {
                 handleSubmit={handleSubmit}
               />
             </div>
+           
             <div className="space-y-1">
               <MovieSearchList  movies = {movies}/>
+              {totalResults > 20 && (
+                <Pagination
+                  pages={numberPages}
+                  nextPage={nextPage}
+                  currentPage={currentPage}
+                />
+              )}
             </div>
           </CardContent>
           <CardFooter>
-            <Button>Save changes</Button>
+            
           </CardFooter>
         </Card>
       </TabsContent>
