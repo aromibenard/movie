@@ -7,8 +7,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import {
   Tabs,
   TabsContent,
@@ -19,8 +17,9 @@ import SearchBar from "./SearchBar"
 import React, { useState } from "react"
 import MovieSearchList from "./MovieSearchList"
 import Pagination from "./Pagination"
+import MovieItem from "./MovieItem"
 
-export function ContentTab() {
+export function ContentTab({ userId, watchlist }) {
 
   const [movies, setMovies] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -72,12 +71,12 @@ export function ContentTab() {
 
 
   return (
-    <Tabs defaultValue="watchlist" className="w-full">
+    <Tabs defaultValue="add-watchlist" className="w-full">
       <TabsList className="grid w-full grid-cols-2">
-        <TabsTrigger value="watchlist">Watch List</TabsTrigger>
-        <TabsTrigger value="recommendations">Recommendations</TabsTrigger>
+        <TabsTrigger value="add-watchlist">Add to Watch List</TabsTrigger>
+        <TabsTrigger value="watchlist">My Watchlist</TabsTrigger>
       </TabsList>
-      <TabsContent value="watchlist">
+      <TabsContent value="add-watchlist">
         <Card>
           <CardHeader>
             <CardTitle></CardTitle>
@@ -96,7 +95,7 @@ export function ContentTab() {
             </div>
            
             <div className="space-y-1">
-              <MovieSearchList  movies = {movies}/>
+              <MovieSearchList  movies = {movies} userId={userId}/>
               {totalResults > 20 && (
                 <Pagination
                   pages={numberPages}
@@ -111,26 +110,23 @@ export function ContentTab() {
           </CardFooter>
         </Card>
       </TabsContent>
-      <TabsContent value="recommendations">
+      <TabsContent value="watchlist">
         <Card>
           <CardHeader>
-            <CardTitle>Password</CardTitle>
+            <CardTitle></CardTitle>
             <CardDescription>
-              Change your password here. After saving, youll be logged out.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
-            <div className="space-y-1">
-              <Label htmlFor="current">Current password</Label>
-              <Input id="current" type="password" />
+            <div className='grid grid-cols-3 gap-1.5'>
+              {watchlist.map((movie, i) => (
+                <MovieItem key={i} movie={movie}/>
+              ))}
             </div>
-            <div className="space-y-1">
-              <Label htmlFor="new">New password</Label>
-              <Input id="new" type="password" />
-            </div>
+              
           </CardContent>
           <CardFooter>
-            <Button>Save password</Button>
+            <Button></Button>
           </CardFooter>
         </Card>
       </TabsContent>

@@ -11,6 +11,8 @@ import { ClockIcon } from "@radix-ui/react-icons";
 import { User, onAuthStateChanged } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { db } from '@/firebase'
+import { collection, getDocs, doc } from "firebase/firestore";
 
 export default function HomePage() {
 
@@ -18,6 +20,8 @@ export default function HomePage() {
     const [userName, setUserName] = useState('')
     const [photoURL, setPhotoURL] = useState('')
     const [user, setUser] = useState<User | null>(null)
+    const [userId, setUserId] = useState<string>('')
+    const [watchlist, setWatchlist] = useState([])
     const router = useRouter()
 
     useEffect(() => {
@@ -28,9 +32,13 @@ export default function HomePage() {
     
             const user = auth.currentUser
             setUser(user)
+            const uid = user.uid
+            setUserId(uid)
             const photoURL = user?.photoURL
             setUserName(user!.displayName!)
             setPhotoURL(user?.photoURL || '')
+            
+            fetchWatchlist(uid)
             
     
           } else {
@@ -42,7 +50,18 @@ export default function HomePage() {
     
         // Clean up function
         return () => unsubscribe();
-      }, [router]);
+    }, [router]);
+
+    const fetchWatchlist = async (uid:string) => {
+      try {
+        const querySnapshot = await getDocs( collection(db, 'users', uid, 'watchlist'))
+        const watchlistData = querySnapshot.docs.map(doc => doc.data())
+        setWatchlist(watchlistData)
+      } catch (error) {
+        console.error("Error fetching watchlist:", error)
+      }
+      
+    }
     
       if (loading) {
         return <Loading/>
@@ -51,13 +70,13 @@ export default function HomePage() {
     return(
         <div>
           <Nav userName={userName} photoURL={photoURL} user={user}/>
-          <Body userName={userName} photoURL={photoURL} user={user}/>
+          <Body userName={userName} photoURL={photoURL} user={user} userId={userId} watchlist={watchlist}/>
         </div>
     )
 }
 
 //sub components
-const Body: React.FC<NavProps> = ({userName, photoURL}) => {
+const Body: React.FC<NavProps> = ({userName, photoURL, userId, watchlist }) => {
   return (
     <div className="h-dvh bg-slate-50 md:max-w-5xl mx-auto p-4">
       <div className="grid md:grid-cols-4 gap-4 h-[15rem]">
@@ -76,7 +95,7 @@ const Body: React.FC<NavProps> = ({userName, photoURL}) => {
           <Button className="flex mx-auto">Edit Profile</Button>
         </div>
         <div className=" p-4 col-span-3">
-          <ContentTab />
+          <ContentTab userId={userId} watchlist={watchlist}/>
         </div>
       </div>
     </div>
