@@ -1,3 +1,4 @@
+import { Button } from '@mui/material';
 import React from 'react';
 
 interface Movie {
@@ -8,9 +9,10 @@ interface Movie {
 
 interface MovieItemProps {
   movie: Movie;
+
 }
 
-const MovieItem: React.FC<MovieItemProps> = ({ movie }) => {
+const MovieItem: React.FC<MovieItemProps> = ({ movie, deleteFromWatchlist }) => {
   return (
     <div className='border shadow-sm hover:scale-95 transition rounded cursor-pointer'>
       <div>
@@ -22,7 +24,9 @@ const MovieItem: React.FC<MovieItemProps> = ({ movie }) => {
       </div>
       <div className='m-1 p-1'>
         <p className='font-semibold text-gray-600 text-pretty px-2'>{movie.title}</p>
-        <p className='text-gray-600 text-pretty px-2'>{movie.release_date}</p>
+        <Button onClick={deleteFromWatchlist}>
+          Delete
+        </Button>
       </div>
     </div>
   );

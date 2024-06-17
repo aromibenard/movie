@@ -12,7 +12,10 @@ import { User, onAuthStateChanged } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { db } from '@/firebase'
-import { collection, getDocs, doc } from "firebase/firestore";
+import { collection, getDocs, doc, addDoc, deleteDoc } from "firebase/firestore";
+import { Movie } from "@/components/MovieSearchList";
+
+
 
 export default function HomePage() {
 
@@ -22,6 +25,12 @@ export default function HomePage() {
     const [user, setUser] = useState<User | null>(null)
     const [userId, setUserId] = useState<string>('')
     const [watchlist, setWatchlist] = useState([])
+    const [searchTerm, setSearchTerm] = useState('');
+    const [totalResults, setTotalResults ] = useState(0)
+    const [currentPage, setCurrentPage ] = useState(1)
+    const [movies, setMovies] = useState([]);
+    const numberPages = Math.ceil(totalResults / 20 )
+    const apiKey = process.env.NEXT_PUBLIC_TMDB_API_KEY
     const router = useRouter()
 
     useEffect(() => {
@@ -32,7 +41,7 @@ export default function HomePage() {
     
             const user = auth.currentUser
             setUser(user)
-            const uid = user.uid
+            const uid = user!.uid
             setUserId(uid)
             const photoURL = user?.photoURL
             setUserName(user!.displayName!)
@@ -62,6 +71,65 @@ export default function HomePage() {
       }
       
     }
+
+    const addToWatchlist = async (movie:Movie) => { 
+
+      try {
+        const docRef = await addDoc(collection(db, 'users', userId, 'watchlist'), movie);
+        console.log('Movie added to watchlist with ID: ', docRef.id);
+        setWatchlist(prevWatchlist => [...prevWatchlist, { ...movie, id: docRef.id }])
+  
+      } catch (error) {
+        console.error('Error adding movie to watchlist:', error);
+      }
+      
+    }
+
+    const deleteFromWatchlist = async (movieId: string) => {
+      try {
+
+        const movieRef = doc(db, 'users', userId, 'watchlist', movieId);
+        await deleteDoc(movieRef);
+        console.log('Movie deleted from watchlist');
+        setWatchlist(prevWatchlist => prevWatchlist.filter(movie => movie.id !== movieId));
+      } catch (error) {
+        console.error('Error deleting movie from watchlist:', error);
+      }
+    };
+    
+
+    const handleSubmit = async (e: React.FormEvent) => {
+      e.preventDefault();
+      try {
+        const response = await fetch(
+          `https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&query=${searchTerm}`
+        );
+        const data = await response.json();
+        setMovies(data.results);
+        setTotalResults(data.total_results);
+        setCurrentPage(1); // Reset to first page on new search
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    }
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      e.preventDefault();
+      setSearchTerm(e.target.value);
+    }
+
+    const nextPage = async (pageNumber: number) => {
+      try {
+        const response = await fetch(
+          `https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&query=${searchTerm}&page=${pageNumber}`
+        );
+        const data = await response.json();
+        setMovies(data.results); // Set new movies, replacing old ones
+        setCurrentPage(pageNumber);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
     
       if (loading) {
         return <Loading/>
@@ -70,13 +138,63 @@ export default function HomePage() {
     return(
         <div>
           <Nav userName={userName} photoURL={photoURL} user={user}/>
-          <Body userName={userName} photoURL={photoURL} user={user} userId={userId} watchlist={watchlist}/>
+          <Body 
+            userName={userName} 
+            photoURL={photoURL} 
+            user={user} 
+            userId={userId} 
+            watchlist={watchlist}
+            handleSubmit={handleSubmit}
+            handleChange={handleChange}
+            addToWatchlist={addToWatchlist}
+            deleteFromWatchlist={deleteFromWatchlist}
+            nextPage={nextPage}
+            currentPage={currentPage}
+            searchTerm={searchTerm}
+            numberPages={numberPages}
+            movies={movies}
+            totalResults={totalResults}
+          />
         </div>
     )
 }
 
+export interface BodyProps {
+  userName?: string;
+  photoURL?: string;
+  user?: User | null;
+  userId?: string;
+  watchlist: Movie[];
+  handleSubmit: (e: React.FormEvent) => void;
+  handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  addToWatchlist: (movie: Movie) => void;
+  nextPage: (pageNumber: number) => void;
+  deleteFromWatchlist: (movieId: string) => void;
+  currentPage: number;
+  searchTerm: string;
+  numberPages: number;
+  movies: Movie[];
+  totalResults: number;
+}
+
 //sub components
-const Body: React.FC<NavProps> = ({userName, photoURL, userId, watchlist }) => {
+const Body: React.FC<BodyProps> = ({
+  userName, 
+  photoURL, 
+  userId, 
+  watchlist,
+  handleSubmit,
+  handleChange,
+  addToWatchlist,
+  nextPage,
+  currentPage,
+  searchTerm,
+  numberPages,
+  movies,
+  totalResults,
+  deleteFromWatchlist
+
+}) => {
   return (
     <div className="h-dvh bg-slate-50 md:max-w-5xl mx-auto p-4">
       <div className="grid md:grid-cols-4 gap-4 h-[15rem]">
@@ -95,7 +213,21 @@ const Body: React.FC<NavProps> = ({userName, photoURL, userId, watchlist }) => {
           <Button className="flex mx-auto">Edit Profile</Button>
         </div>
         <div className=" p-4 col-span-3">
-          <ContentTab userId={userId} watchlist={watchlist}/>
+          <ContentTab 
+            userId={userId} 
+            watchlist={watchlist}
+            handleSubmit={handleSubmit}
+            handleChange={handleChange}
+            addToWatchlist={addToWatchlist}
+            nextPage={nextPage}
+            currentPage={currentPage}
+            searchTerm={searchTerm}
+            numberPages={numberPages}
+            movies={movies}
+            totalResults={totalResults}
+            deleteFromWatchlist={deleteFromWatchlist}
+
+          />
         </div>
       </div>
     </div>

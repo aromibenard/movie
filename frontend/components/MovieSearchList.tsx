@@ -1,10 +1,9 @@
 import React from 'react'
 import { Button } from './ui/button'
 import { Add } from '@mui/icons-material'
-import { db } from '@/firebase'
-import { addDoc, collection } from "firebase/firestore";
+import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from './ui/alert-dialog';
 
-interface Movie {
+ export interface Movie {
   poster_path: string | null
   title: string 
   release_date: string
@@ -12,6 +11,8 @@ interface Movie {
 
 interface MovieSearchListProps {
   movies: Movie[]
+  userId: string
+  addToWatchlist: (movie: Movie) => void
 }
 
 interface MovieProps {
@@ -22,20 +23,11 @@ interface MovieProps {
   addToWatchlist : (movie : Movie) => void
 }
 
-const MovieSearchList: React.FC<MovieSearchListProps> = ({movies, userId}) => {
-  const addToWatchlist = async (movie:Movie) => {
-    try {
-      const docRef = await addDoc(collection(db, 'users', userId, 'watchlist'), movie);
-      console.log('Movie added to watchlist with ID: ', docRef.id);
-    } catch (error) {
-      console.error('Error adding movie to watchlist:', error);
-    }
-    
-  }
+const MovieSearchList: React.FC<MovieSearchListProps> = ({movies, userId, addToWatchlist }) => {
 
   return (
     <div>
-      <div className='grid grid-cols-3 gap-1.5'>
+      <div className='grid grid-cols-4 gap-1.5'>
         {
           movies.map((movie, i ) => {
               return (
@@ -59,9 +51,14 @@ const MovieSearchList: React.FC<MovieSearchListProps> = ({movies, userId}) => {
 
 
 const Movie : React.FC<MovieProps> = ({ image, title, release_date, movie, addToWatchlist  }) => {
+    
+
+  
   const handleClick = () => {
     addToWatchlist(movie)
+
   }
+
 
   return (
     <div className='border shadow-sm hover:scale-95 transition rounded cursor-pointer '>
@@ -74,11 +71,26 @@ const Movie : React.FC<MovieProps> = ({ image, title, release_date, movie, addTo
             )}
         </div>
         
-        <div className='m-1 p-1'>
+        <div className='m-1 p-1 grid'>
           <p className='font-semibold text-gray-600 text-pretty px-2'>{title}</p>
-          <Button variant={'link'} className='my-2' onClick={handleClick}>
-            <span><Add/></span>Add to Watchlist
-          </Button>
+          <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant={'link'} className='my-1 px-1 flex mx-auto' onClick={handleClick}>
+                  <p><span><Add/></span>Add to Watchlist</p>
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>{movie.title} Added!</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Visit your watchlist to view all your movies😉
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Okay</AlertDialogCancel>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       
     </div>

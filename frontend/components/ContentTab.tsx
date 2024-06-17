@@ -18,65 +18,45 @@ import React, { useState } from "react"
 import MovieSearchList from "./MovieSearchList"
 import Pagination from "./Pagination"
 import MovieItem from "./MovieItem"
+import { SuccessToast} from "./Toaster"
+import { useToast } from "./ui/use-toast"
+import { ToastAction } from "./ui/toast"
+import { BodyProps } from "@/app/home/page"
 
-export function ContentTab({ userId, watchlist }) {
 
-  const [movies, setMovies] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [totalResults, setTotalResults ] = useState(0)
-  const [currentPage, setCurrentPage ] = useState(1)
-  const apiKey = process.env.NEXT_PUBLIC_TMDB_API_KEY
+interface ContentTabProps extends BodyProps {
+}
 
-  type Movie = {
-    id: number;
-    title: string;
-
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const response = await fetch(
-        `https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&query=${searchTerm}`
-      );
-      const data = await response.json();
-      setMovies(data.results);
-      setTotalResults(data.total_results);
-      setCurrentPage(1); // Reset to first page on new search
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  }
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    e.preventDefault();
-    setSearchTerm(e.target.value);
-  }
+export function ContentTab({
+  userId, 
+  watchlist,
+  handleSubmit,
+  handleChange,
+  addToWatchlist,
+  nextPage,
+  currentPage,
+  searchTerm,
+  numberPages,
+  movies,
+  totalResults,
+  deleteFromWatchlist
   
+} : ContentTabProps) {
+  interface Movie {
+    poster_path: string | null;
+    title: string;
+    release_date: string;
+  }
 
-  const nextPage = async (pageNumber: number) => {
-    try {
-      const response = await fetch(
-        `https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&query=${searchTerm}&page=${pageNumber}`
-      );
-      const data = await response.json();
-      setMovies(data.results); // Set new movies, replacing old ones
-      setCurrentPage(pageNumber);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
-
-  const numberPages = Math.ceil(totalResults / 20 )
-
+  const { toast } = useToast()
 
   return (
-    <Tabs defaultValue="add-watchlist" className="w-full">
+    <Tabs defaultValue="watchlist" className="w-full">
       <TabsList className="grid w-full grid-cols-2">
-        <TabsTrigger value="add-watchlist">Add to Watch List</TabsTrigger>
         <TabsTrigger value="watchlist">My Watchlist</TabsTrigger>
+        <TabsTrigger value="add-watchlist">Add to Watch List</TabsTrigger>
       </TabsList>
-      <TabsContent value="add-watchlist">
+      <TabsContent value="watchlist">
         <Card>
           <CardHeader>
             <CardTitle></CardTitle>
@@ -84,7 +64,27 @@ export function ContentTab({ userId, watchlist }) {
               Search for movie here. Click Add to update your watchlist
             </CardDescription>
           </CardHeader>
+          <CardContent className="space-y-2">
+            <div className='grid grid-cols-4 gap-1.5'>
+              {watchlist.map((movie : Movie, i : number) => (
+                <MovieItem key={i} movie={movie} deleteFromWatchlist={deleteFromWatchlist}/>
+              ))}
+            </div>
+                
+          </CardContent>
           
+          <CardFooter>
+            
+          </CardFooter>
+        </Card>
+      </TabsContent>
+      <TabsContent value="add-watchlist">
+        <Card>
+          <CardHeader>
+            <CardTitle></CardTitle>
+            <CardDescription>
+            </CardDescription>
+          </CardHeader>
           <CardContent className="space-y-2">
             <div className="space-y-1">
               <SearchBar 
@@ -95,7 +95,7 @@ export function ContentTab({ userId, watchlist }) {
             </div>
            
             <div className="space-y-1">
-              <MovieSearchList  movies = {movies} userId={userId}/>
+              <MovieSearchList  movies = {movies} userId={userId} addToWatchlist={addToWatchlist} />
               {totalResults > 20 && (
                 <Pagination
                   pages={numberPages}
@@ -105,28 +105,18 @@ export function ContentTab({ userId, watchlist }) {
               )}
             </div>
           </CardContent>
-          <CardFooter>
-            
-          </CardFooter>
-        </Card>
-      </TabsContent>
-      <TabsContent value="watchlist">
-        <Card>
-          <CardHeader>
-            <CardTitle></CardTitle>
-            <CardDescription>
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <div className='grid grid-cols-3 gap-1.5'>
-              {watchlist.map((movie, i) => (
-                <MovieItem key={i} movie={movie}/>
-              ))}
-            </div>
               
-          </CardContent>
           <CardFooter>
-            <Button></Button>
+            <Button onClick={() => {
+               console.log('clicked')
+               toast({
+                title: "Added Successfully!",
+                description: "Movie added to watchlist.",
+                action: (
+                  <ToastAction altText="Undo">Undo</ToastAction>
+                ),
+              });    
+            }}>add</Button>
           </CardFooter>
         </Card>
       </TabsContent>
