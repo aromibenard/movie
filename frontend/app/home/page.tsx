@@ -3,7 +3,7 @@
 import Clock from "@/components/Clock";
 import { ContentTab } from "@/components/ContentTab";
 import Loading from "@/components/Loading";
-import Nav, { NavProps } from "@/components/Nav";
+import Nav from "@/components/Nav";
 import { Button } from "@/components/ui/button";
 import { auth } from "@/firebase";
 import { Avatar } from "@mui/material";
@@ -29,6 +29,7 @@ export default function HomePage() {
     const [totalResults, setTotalResults ] = useState(0)
     const [currentPage, setCurrentPage ] = useState(1)
     const [movies, setMovies] = useState([]);
+
     const numberPages = Math.ceil(totalResults / 20 )
     const apiKey = process.env.NEXT_PUBLIC_TMDB_API_KEY
     const router = useRouter()
@@ -138,6 +139,8 @@ export default function HomePage() {
     return(
         <div>
           <Nav userName={userName} photoURL={photoURL} user={user}/>
+
+          {/* body component used here is on the same file */}
           <Body 
             userName={userName} 
             photoURL={photoURL} 
@@ -183,15 +186,15 @@ const Body: React.FC<BodyProps> = ({
   photoURL, 
   userId, 
   watchlist,
-  handleSubmit,
-  handleChange,
-  addToWatchlist,
-  nextPage,
   currentPage,
   searchTerm,
   numberPages,
   movies,
   totalResults,
+  handleSubmit,
+  handleChange,
+  addToWatchlist,
+  nextPage,
   deleteFromWatchlist
 
 }) => {
