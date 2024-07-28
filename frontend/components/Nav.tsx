@@ -1,6 +1,9 @@
+'use client'
+
 import { Avatar } from "@mui/material";
 import { VideoIcon } from "@radix-ui/react-icons";
-import { User } from "firebase/auth";
+import { signOut, User } from "firebase/auth";
+import { auth } from "@/firebase";
 
 import { DropdownMenu, 
     DropdownMenuContent, 
@@ -15,6 +18,9 @@ import { DropdownMenu,
     DropdownMenuSubTrigger, 
     DropdownMenuTrigger 
 } from "./ui/dropdown-menu";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Loading from "./Loading";
 
 export interface NavProps {
     userName: string,
@@ -23,6 +29,24 @@ export interface NavProps {
 }
 
 const Nav: React.FC<NavProps> = ({ userName, photoURL, user }) => {
+    const [loading, setLoading] = useState(false)
+    const router = useRouter()
+
+
+    async function logout() {
+        setLoading(true)
+        return signOut(auth)
+            .then(() => {
+                router.push('/')
+                setLoading(false)
+            }).catch ((error) => {
+                //handle
+            })
+        
+    }
+
+    if (loading) return <Loading />
+    
     return (
         <div className="bg-slate-200 h-14 w-full flex justify-around items-center shadow">
             
@@ -87,7 +111,7 @@ const Nav: React.FC<NavProps> = ({ userName, photoURL, user }) => {
                         <DropdownMenuItem>Support</DropdownMenuItem>
                         <DropdownMenuItem disabled>API</DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem>
+                        <DropdownMenuItem onClick={logout} >
                         Log out
                         <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
                         </DropdownMenuItem>

@@ -17,7 +17,7 @@ export default function Login() {
 
         return signInWithPopup(auth, provider)
         .then(() => {
-
+            setLoading(true)
             router.push('/home')
             setLoading(false)
 
