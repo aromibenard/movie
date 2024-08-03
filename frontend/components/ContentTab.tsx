@@ -21,7 +21,6 @@ import MovieItem from "./MovieItem"
 import { useToast } from "./ui/use-toast"
 import { ToastAction } from "./ui/toast"
 import { BodyProps } from "@/app/home/page"
-import { SkeletonCard } from "./SkeletonCard"
 import { Skeleton } from "./ui/skeleton"
 
 
