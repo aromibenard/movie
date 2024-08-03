@@ -2,16 +2,18 @@ import React from 'react'
 import { Button } from './ui/button'
 import { Add } from '@mui/icons-material'
 import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from './ui/alert-dialog';
+import Loading from './Loading';
 
  export interface Movie {
   poster_path: string | null
   title: string 
   release_date: string
+  id: number
 }
 
 interface MovieSearchListProps {
   movies: Movie[]
-  userId: string
+  userId: string | null
   addToWatchlist: (movie: Movie) => void
 }
 
@@ -24,24 +26,25 @@ interface MovieProps {
 }
 
 const MovieSearchList: React.FC<MovieSearchListProps> = ({movies, userId, addToWatchlist }) => {
-
   return (
     <div>
       <div className='grid grid-cols-4 gap-1.5'>
-        {
-          movies.map((movie, i ) => {
-              return (
-                  <Movie 
-                    key={i} 
-                    image={movie.poster_path} 
-                    title={movie.title} 
-                    release_date={movie.release_date}
-                    movie={movie}
-                    addToWatchlist={addToWatchlist}
-                  />
-              )
-          })
-        }
+        {Array.isArray(movies) ? (
+            movies.map((movie, i ) => {
+                return (
+                    <Movie 
+                      key={i} 
+                      image={movie.poster_path} 
+                      title={movie.title} 
+                      release_date={movie.release_date}
+                      movie={movie}
+                      addToWatchlist={addToWatchlist}
+                    />
+                )
+            })
+        ): (
+          <div className='w-full flex justify-center'><Loading/></div>
+        )}
         
       </div>
     </div>

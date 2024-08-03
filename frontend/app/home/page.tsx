@@ -4,16 +4,17 @@ import Clock from "@/components/Clock";
 import { ContentTab } from "@/components/ContentTab";
 import Loading from "@/components/Loading";
 import Nav from "@/components/Nav";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { auth } from "@/firebase";
 import { Avatar } from "@mui/material";
 import { ClockIcon } from "@radix-ui/react-icons";
-import { User, onAuthStateChanged } from "firebase/auth";
+import { User, onAuthStateChanged, signOut } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { db } from '@/firebase'
-import { collection, getDocs, doc, addDoc, deleteDoc } from "firebase/firestore";
+import { collection, getDocs, doc, addDoc, deleteDoc, updateDoc, deleteField, getDoc, DocumentData } from "firebase/firestore";
 import { Movie } from "@/components/MovieSearchList";
+import Link from "next/link";
 
 
 
@@ -86,31 +87,55 @@ export default function HomePage() {
       
     }
 
-    const deleteFromWatchlist = async (movieId: string) => {
-      try {
+    // const deleteFromWatchlist = async (id: string) => {
+    //   try {
+    //     const userRef = doc(db, 'users', userId); // Reference to the user document
+    
+    //     // Fetch the current watchlist data
+    //     const watchlistSnapshot = await getDoc(userRef);
+    //     const currentWatchlist = watchlistSnapshot.data()?.watchlist || [];
+    
+    //     // Filter out the movie to delete
+    //     const updatedWatchlist = currentWatchlist.filter(
+    //       (movie: Movie) => movie.id !== Number(id)
+    //     );
+    
+    //     // Update the 'watchlist' field in Firestore
+    //     await updateDoc(userRef, { watchlist: updatedWatchlist });
+    
+    //     // Update local state (assuming you're using a state management library like React)
+    //     setWatchlist(updatedWatchlist);
+    
+    //     console.log(`Movie ${id} deleted from watchlist`);
+    //   } catch (error) {
+    //     console.error("Error deleting movie from watchlist:", error);
+    //   }
+    // };
+    
 
-        const movieRef = doc(db, 'users', userId, 'watchlist', movieId);
+    const deleteFromWatchlist = async (id: string) => {
+      try {
+        const movieRef = doc(db, 'users', userId, 'watchlist', id);
         await deleteDoc(movieRef);
-        console.log('Movie deleted from watchlist');
-        setWatchlist(prevWatchlist => prevWatchlist.filter(movie => movie.id !== movieId));
+        setWatchlist(prevWatchlist => prevWatchlist.filter(movie => movie.id !== Number(id)));
+        console.log(`Movie ${id} deleted from watchlist`);
       } catch (error) {
         console.error('Error deleting movie from watchlist:', error);
       }
-    };
+    }
     
-
     const handleSubmit = async (e: React.FormEvent) => {
-      e.preventDefault();
+      e.preventDefault()
       try {
         const response = await fetch(
           `https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&query=${searchTerm}`
-        );
-        const data = await response.json();
-        setMovies(data.results);
-        setTotalResults(data.total_results);
-        setCurrentPage(1); // Reset to first page on new search
+        )
+        const data = await response.json()
+        setMovies(data.results)
+        setTotalResults(data.total_results)
+        setCurrentPage(1) // Reset to first page on new search
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error("Error fetching data:", error)
       }
     }
 
@@ -157,6 +182,7 @@ export default function HomePage() {
             numberPages={numberPages}
             movies={movies}
             totalResults={totalResults}
+            router={router}
           />
         </div>
     )
@@ -166,18 +192,19 @@ export interface BodyProps {
   userName?: string;
   photoURL?: string;
   user?: User | null;
-  userId?: string;
+  userId?: string | null;
   watchlist: Movie[];
   handleSubmit: (e: React.FormEvent) => void;
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   addToWatchlist: (movie: Movie) => void;
   nextPage: (pageNumber: number) => void;
-  deleteFromWatchlist: (movieId: string) => void;
+  deleteFromWatchlist: (id: string) => void;
   currentPage: number;
   searchTerm: string;
   numberPages: number;
   movies: Movie[];
   totalResults: number;
+  router?: any;
 }
 
 //sub components
@@ -195,13 +222,23 @@ const Body: React.FC<BodyProps> = ({
   handleChange,
   addToWatchlist,
   nextPage,
-  deleteFromWatchlist
+  deleteFromWatchlist,
+  router
 
 }) => {
+  
+  const logout = async () => {
+
+    try {
+      await signOut(auth)
+      router.push('/')
+    } catch {(error: any) => {}}
+  }
+
   return (
     <div className="h-dvh bg-slate-50 md:max-w-5xl mx-auto p-4">
       <div className="grid md:grid-cols-4 gap-4 h-[15rem]">
-        <div className="bg-yellow-100 p-4 col-span-1">
+        <div className="bg-yellow-100 p-4 col-span-1 flex flex-col items-center">
           <Avatar 
             src={photoURL}
             alt={userName}
@@ -213,7 +250,14 @@ const Body: React.FC<BodyProps> = ({
             <ClockIcon className="text-2xl"/>
             <Clock />
           </div>
-          <Button className="flex mx-auto">Edit Profile</Button>
+          <div className="grid space-y-4">
+            <Link href={'/profile'} className = {buttonVariants({ variant:'outline' })}>
+              View Profile
+            </Link>
+            <Button onClick={logout} >
+              Log Out
+            </Button>
+          </div>
         </div>
         <div className=" p-4 col-span-3">
           <ContentTab 

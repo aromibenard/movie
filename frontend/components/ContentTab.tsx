@@ -42,10 +42,12 @@ export function ContentTab({
   deleteFromWatchlist
   
 } : ContentTabProps) {
+  
   interface Movie {
     poster_path: string | null;
     title: string;
     release_date: string;
+    id: number
   }
 
   const { toast } = useToast()
