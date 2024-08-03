@@ -12,15 +12,22 @@ import { User, onAuthStateChanged, signOut } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { db } from '@/firebase'
-import { collection, getDocs, doc, addDoc, deleteDoc, updateDoc, deleteField, getDoc, DocumentData } from "firebase/firestore";
+import { collection, 
+  getDocs, 
+  doc, 
+  addDoc,
+  deleteDoc, 
+  updateDoc, 
+  deleteField, 
+  getDoc, 
+  DocumentData 
+} from "firebase/firestore";
 import { Movie } from "@/components/MovieSearchList";
 import Link from "next/link";
 
-
-
 export default function HomePage() {
-
     const [loading, setLoading] = useState(true)
+    const [isLoading, setIsLoading] = useState(true)
     const [userName, setUserName] = useState('')
     const [photoURL, setPhotoURL] = useState('')
     const [user, setUser] = useState<User | null>(null)
@@ -40,18 +47,14 @@ export default function HomePage() {
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
           if (user) {
             router.push('/home')
-    
             const user = auth.currentUser
             setUser(user)
             const uid = user!.uid
             setUserId(uid)
-            const photoURL = user?.photoURL
             setUserName(user!.displayName!)
             setPhotoURL(user?.photoURL || '')
-            
+            setIsLoading(true)
             fetchWatchlist(uid)
-            
-    
           } else {
             setUser(null)
             router.push('/auth/register');
@@ -70,12 +73,12 @@ export default function HomePage() {
         setWatchlist(watchlistData)
       } catch (error) {
         console.error("Error fetching watchlist:", error)
-      }
-      
+      } finally {
+        setIsLoading(false)
+      }     
     }
 
     const addToWatchlist = async (movie:Movie) => { 
-
       try {
         const docRef = await addDoc(collection(db, 'users', userId, 'watchlist'), movie);
         console.log('Movie added to watchlist with ID: ', docRef.id);
@@ -183,6 +186,7 @@ export default function HomePage() {
             movies={movies}
             totalResults={totalResults}
             router={router}
+            isLoading={isLoading}
           />
         </div>
     )
@@ -205,6 +209,7 @@ export interface BodyProps {
   movies: Movie[];
   totalResults: number;
   router?: any;
+  isLoading?: boolean; 
 }
 
 //sub components
@@ -223,12 +228,11 @@ const Body: React.FC<BodyProps> = ({
   addToWatchlist,
   nextPage,
   deleteFromWatchlist,
-  router
-
+  router,
+  isLoading
 }) => {
   
   const logout = async () => {
-
     try {
       await signOut(auth)
       router.push('/')
@@ -273,7 +277,7 @@ const Body: React.FC<BodyProps> = ({
             movies={movies}
             totalResults={totalResults}
             deleteFromWatchlist={deleteFromWatchlist}
-
+            isLoading={isLoading}
           />
         </div>
       </div>

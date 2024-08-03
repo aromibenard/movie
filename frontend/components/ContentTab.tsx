@@ -21,6 +21,8 @@ import MovieItem from "./MovieItem"
 import { useToast } from "./ui/use-toast"
 import { ToastAction } from "./ui/toast"
 import { BodyProps } from "@/app/home/page"
+import { SkeletonCard } from "./SkeletonCard"
+import { Skeleton } from "./ui/skeleton"
 
 
 interface ContentTabProps extends BodyProps {
@@ -38,7 +40,8 @@ export function ContentTab({
   numberPages,
   movies,
   totalResults,
-  deleteFromWatchlist
+  deleteFromWatchlist,
+  isLoading
   
 } : ContentTabProps) {
   
@@ -65,9 +68,19 @@ export function ContentTab({
           </CardHeader>
           <CardContent className="space-y-2">
             <div className='grid grid-cols-4 gap-1.5'>
-              {watchlist.map((movie : Movie, i : number) => (
-                <MovieItem key={i} movie={movie} deleteFromWatchlist={deleteFromWatchlist}/>
-              ))}
+              {isLoading ? (
+                <div className="flex flex-col space-y-3 w-full h-full">
+                  <Skeleton className="h-[220px] w-full rounded-xl" />
+                  <div className="space-y-2">
+                    <Skeleton className="h-full w-full" />
+                    <Skeleton className="h-full w-full" />
+                  </div>
+                </div>
+              ) : (
+                watchlist.map((movie : Movie, i : number) => (
+                  <MovieItem key={i} movie={movie} deleteFromWatchlist={deleteFromWatchlist}/>
+                ))
+              )}
             </div>
                 
           </CardContent>

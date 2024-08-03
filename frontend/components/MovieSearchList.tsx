@@ -1,7 +1,15 @@
 import React from 'react'
 import { Button } from './ui/button'
 import { Add } from '@mui/icons-material'
-import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from './ui/alert-dialog';
+import { AlertDialog, 
+  AlertDialogCancel, 
+  AlertDialogContent, 
+  AlertDialogDescription, 
+  AlertDialogFooter, 
+  AlertDialogHeader, 
+  AlertDialogTitle, 
+  AlertDialogTrigger 
+} from './ui/alert-dialog';
 import Loading from './Loading';
 
  export interface Movie {
