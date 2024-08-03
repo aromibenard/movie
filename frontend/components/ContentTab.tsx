@@ -18,7 +18,6 @@ import React, { useState } from "react"
 import MovieSearchList from "./MovieSearchList"
 import Pagination from "./Pagination"
 import MovieItem from "./MovieItem"
-import { SuccessToast} from "./Toaster"
 import { useToast } from "./ui/use-toast"
 import { ToastAction } from "./ui/toast"
 import { BodyProps } from "@/app/home/page"
@@ -50,8 +49,6 @@ export function ContentTab({
     id: number
   }
 
-  const { toast } = useToast()
-
   return (
     <Tabs defaultValue="watchlist" className="w-full">
       <TabsList className="grid w-full grid-cols-2">
@@ -63,7 +60,7 @@ export function ContentTab({
           <CardHeader>
             <CardTitle></CardTitle>
             <CardDescription>
-              Search for movie here. Click Add to update your watchlist
+              Current watchlist
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
@@ -85,6 +82,7 @@ export function ContentTab({
           <CardHeader>
             <CardTitle></CardTitle>
             <CardDescription>
+            Search for movie here. Click Add to update your watchlist
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
@@ -106,19 +104,8 @@ export function ContentTab({
                 />
               )}
             </div>
-          </CardContent>
-              
+          </CardContent>   
           <CardFooter>
-            <Button onClick={() => {
-               console.log('clicked')
-               toast({
-                title: "Added Successfully!",
-                description: "Movie added to watchlist.",
-                action: (
-                  <ToastAction altText="Undo">Undo</ToastAction>
-                ),
-              });    
-            }}>add</Button>
           </CardFooter>
         </Card>
       </TabsContent>
