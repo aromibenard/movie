@@ -1,18 +1,6 @@
+import { MovieItemProps } from '@/types/types';
 import { Button } from '@mui/material';
 import React from 'react';
-
-interface Movie {
-  poster_path: string | null;
-  title: string;
-  release_date: string;
-  id: number;
-}
-
-interface MovieItemProps {
-  movie: Movie;
-  deleteFromWatchlist: (id: string) => void;
-  key: number;
-}
 
 const MovieItem: React.FC<MovieItemProps> = ({ movie, deleteFromWatchlist, key }) => {
 

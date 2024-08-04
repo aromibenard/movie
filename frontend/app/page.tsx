@@ -2,7 +2,6 @@
 
 import Body from "@/components/Body";
 import Loading from "@/components/Loading";
-import NavBar from "@/components/NavBar";
 import { auth } from "@/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { useRouter } from "next/navigation";

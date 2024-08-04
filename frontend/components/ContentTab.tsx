@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button"
 import {
   Card,
   CardContent,
@@ -14,18 +13,13 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs"
 import SearchBar from "./SearchBar"
-import React, { useState } from "react"
+import React from "react"
 import MovieSearchList from "./MovieSearchList"
 import Pagination from "./Pagination"
 import MovieItem from "./MovieItem"
-import { useToast } from "./ui/use-toast"
-import { ToastAction } from "./ui/toast"
-import { BodyProps } from "@/app/home/page"
 import { Skeleton } from "./ui/skeleton"
+import { ContentTabProps, Movie } from "@/types/types"
 
-
-interface ContentTabProps extends BodyProps {
-}
 
 export function ContentTab({
   userId, 
@@ -40,17 +34,11 @@ export function ContentTab({
   movies,
   totalResults,
   deleteFromWatchlist,
-  isLoading
+  isLoading,
+  isFetching
   
 } : ContentTabProps) {
   
-  interface Movie {
-    poster_path: string | null;
-    title: string;
-    release_date: string;
-    id: number
-  }
-
   return (
     <Tabs defaultValue="watchlist" className="w-full">
       <TabsList className="grid w-full grid-cols-2">
@@ -107,7 +95,11 @@ export function ContentTab({
             </div>
            
             <div className="space-y-1">
-              <MovieSearchList  movies = {movies} userId={userId} addToWatchlist={addToWatchlist} />
+              <MovieSearchList  movies = {movies} 
+                userId={userId}
+                isFetching={isFetching} 
+                addToWatchlist={addToWatchlist} 
+              />
               {totalResults > 20 && (
                 <Pagination
                   pages={numberPages}

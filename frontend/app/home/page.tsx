@@ -17,17 +17,14 @@ import { collection,
   doc, 
   addDoc,
   deleteDoc, 
-  updateDoc, 
-  deleteField, 
-  getDoc, 
-  DocumentData 
 } from "firebase/firestore";
-import { Movie } from "@/components/MovieSearchList";
 import Link from "next/link";
+import { BodyProps, Movie } from "@/types/types";
 
 export default function HomePage() {
     const [loading, setLoading] = useState(true)
     const [isLoading, setIsLoading] = useState(true)
+    const [isFetching, setIsFetching] = useState(true)
     const [userName, setUserName] = useState('')
     const [photoURL, setPhotoURL] = useState('')
     const [user, setUser] = useState<User | null>(null)
@@ -42,8 +39,7 @@ export default function HomePage() {
     const apiKey = process.env.NEXT_PUBLIC_TMDB_API_KEY
     const router = useRouter()
 
-    useEffect(() => {
-        
+    useEffect(() => { 
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
           if (user) {
             router.push('/home')
@@ -127,9 +123,13 @@ export default function HomePage() {
       }
     }
     
+    // TODO: fix loading bug
     const handleSubmit = async (e: React.FormEvent) => {
-      e.preventDefault()
+      e.preventDefault() 
       try {
+        setIsFetching(true)
+        console.log(isFetching)
+        await new Promise(resolve => setTimeout(resolve, 4000))
         const response = await fetch(
           `https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&query=${searchTerm}`
         )
@@ -139,7 +139,10 @@ export default function HomePage() {
         setCurrentPage(1) // Reset to first page on new search
       } catch (error) {
         console.error("Error fetching data:", error)
+      } finally {
+        setIsFetching(false)
       }
+      console.log(isFetching)
     }
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -187,30 +190,12 @@ export default function HomePage() {
             totalResults={totalResults}
             router={router}
             isLoading={isLoading}
+            isFetching={isFetching}
           />
         </div>
     )
 }
 
-export interface BodyProps {
-  userName?: string;
-  photoURL?: string;
-  user?: User | null;
-  userId?: string | null;
-  watchlist: Movie[];
-  handleSubmit: (e: React.FormEvent) => void;
-  handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  addToWatchlist: (movie: Movie) => void;
-  nextPage: (pageNumber: number) => void;
-  deleteFromWatchlist: (id: string) => void;
-  currentPage: number;
-  searchTerm: string;
-  numberPages: number;
-  movies: Movie[];
-  totalResults: number;
-  router?: any;
-  isLoading?: boolean; 
-}
 
 //sub components
 const Body: React.FC<BodyProps> = ({
@@ -229,7 +214,9 @@ const Body: React.FC<BodyProps> = ({
   nextPage,
   deleteFromWatchlist,
   router,
-  isLoading
+  isLoading,
+  isFetching
+
 }) => {
   
   const logout = async () => {
@@ -278,10 +265,10 @@ const Body: React.FC<BodyProps> = ({
             totalResults={totalResults}
             deleteFromWatchlist={deleteFromWatchlist}
             isLoading={isLoading}
+            isFetching={isFetching}
           />
         </div>
       </div>
     </div>
   )
 }
-

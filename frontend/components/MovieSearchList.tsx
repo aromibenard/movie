@@ -11,29 +11,12 @@ import { AlertDialog,
   AlertDialogTrigger 
 } from './ui/alert-dialog';
 import Loading from './Loading';
+import { Skeleton } from './ui/skeleton';
+import { MovieProps, MovieSearchListProps } from '@/types/types';
 
- export interface Movie {
-  poster_path: string | null
-  title: string 
-  release_date: string
-  id: number
-}
 
-interface MovieSearchListProps {
-  movies: Movie[]
-  userId: string | null
-  addToWatchlist: (movie: Movie) => void
-}
-
-interface MovieProps {
-  image: string | null
-  title: string 
-  release_date: string
-  movie: Movie
-  addToWatchlist : (movie : Movie) => void
-}
-
-const MovieSearchList: React.FC<MovieSearchListProps> = ({movies, userId, addToWatchlist }) => {
+const MovieSearchList: React.FC<MovieSearchListProps> = ({
+  movies, userId, addToWatchlist, isFetching }) => {
   return (
     <div>
       <div className='grid grid-cols-4 gap-1.5'>
@@ -47,6 +30,7 @@ const MovieSearchList: React.FC<MovieSearchListProps> = ({movies, userId, addToW
                       release_date={movie.release_date}
                       movie={movie}
                       addToWatchlist={addToWatchlist}
+                      isFetching={isFetching}
                     />
                 )
             })
@@ -59,27 +43,30 @@ const MovieSearchList: React.FC<MovieSearchListProps> = ({movies, userId, addToW
   )
 }
 
-
-
-const Movie : React.FC<MovieProps> = ({ image, title, release_date, movie, addToWatchlist  }) => {
+const Movie : React.FC<MovieProps> = ({ 
+ image, title, release_date, movie, addToWatchlist, isFetching  }) => {
     
-
-  
   const handleClick = () => {
     addToWatchlist(movie)
 
   }
 
-
   return (
     <div className='border shadow-sm hover:scale-95 transition rounded cursor-pointer '>
         
         <div className=''>
-            {image == null ? (
-              <img src={'https://picsum.photos/id/357/200/300'} alt='default image' style={{ width: '100%' }} />
+          {isFetching ? (
+            <div style={{ width: '100%', height: '100%' }}>
+              <Skeleton className='w-full h-full'/>
+            </div>
             ) : (
-              <img src={`http://image.tmdb.org/t/p/w185${image}`} alt='movie poster' style={{ width: '100%' }} />
-            )}
+              image == null ? (
+                <img src={'https://picsum.photos/id/357/200/300'} alt='default image' style={{ width: '100%' }} />
+              ) : (
+                <img src={`http://image.tmdb.org/t/p/w185${image}`} alt='movie poster' style={{ width: '100%' }} />
+              )
+            )
+          }
         </div>
         
         <div className='m-1 p-1 grid'>
@@ -102,11 +89,9 @@ const Movie : React.FC<MovieProps> = ({ image, title, release_date, movie, addTo
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
-        </div>
-      
+        </div>   
     </div>
   )
 }
-
 
 export default MovieSearchList

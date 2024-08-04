@@ -2,7 +2,7 @@
 
 import { Avatar } from "@mui/material";
 import { VideoIcon } from "@radix-ui/react-icons";
-import { signOut, User } from "firebase/auth";
+import { signOut } from "firebase/auth";
 import { auth } from "@/firebase";
 
 import { DropdownMenu, 
@@ -21,17 +21,12 @@ import { DropdownMenu,
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Loading from "./Loading";
+import { NavProps } from "@/types/types";
 
-export interface NavProps {
-    userName: string,
-    photoURL: string,
-    user: User | null
-}
 
 const Nav: React.FC<NavProps> = ({ userName, photoURL, user }) => {
     const [loading, setLoading] = useState(false)
     const router = useRouter()
-
 
     async function logout() {
         setLoading(true)
@@ -123,6 +118,3 @@ const Nav: React.FC<NavProps> = ({ userName, photoURL, user }) => {
 }
 
 export default Nav
-
-
-

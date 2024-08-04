@@ -1,10 +1,6 @@
 'use client'
 
-type PaginationProps = {
-  pages: number;
-  nextPage: (page: number) => void;
-  currentPage: number;
-};
+import { PaginationProps } from "@/types/types";
 
 const Pagination: React.FC<PaginationProps> = ({ pages, nextPage, currentPage }) => {
   const pageLinks = [];
