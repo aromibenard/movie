@@ -83,35 +83,8 @@ export default function HomePage() {
       } catch (error) {
         console.error('Error adding movie to watchlist:', error);
       }
-      
     }
-
-    // const deleteFromWatchlist = async (id: string) => {
-    //   try {
-    //     const userRef = doc(db, 'users', userId); // Reference to the user document
     
-    //     // Fetch the current watchlist data
-    //     const watchlistSnapshot = await getDoc(userRef);
-    //     const currentWatchlist = watchlistSnapshot.data()?.watchlist || [];
-    
-    //     // Filter out the movie to delete
-    //     const updatedWatchlist = currentWatchlist.filter(
-    //       (movie: Movie) => movie.id !== Number(id)
-    //     );
-    
-    //     // Update the 'watchlist' field in Firestore
-    //     await updateDoc(userRef, { watchlist: updatedWatchlist });
-    
-    //     // Update local state (assuming you're using a state management library like React)
-    //     setWatchlist(updatedWatchlist);
-    
-    //     console.log(`Movie ${id} deleted from watchlist`);
-    //   } catch (error) {
-    //     console.error("Error deleting movie from watchlist:", error);
-    //   }
-    // };
-    
-
     const deleteFromWatchlist = async (id: string) => {
       try {
         const movieRef = doc(db, 'users', userId, 'watchlist', id);
@@ -122,6 +95,7 @@ export default function HomePage() {
         console.error('Error deleting movie from watchlist:', error);
       }
     }
+
     
     // TODO: fix loading bug
     const handleSubmit = async (e: React.FormEvent) => {
@@ -129,7 +103,7 @@ export default function HomePage() {
       try {
         setIsFetching(true)
         console.log(isFetching)
-        await new Promise(resolve => setTimeout(resolve, 4000))
+        // await new Promise(resolve => setTimeout(resolve, 4000))
         const response = await fetch(
           `https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&query=${searchTerm}`
         )
@@ -146,8 +120,8 @@ export default function HomePage() {
     }
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      e.preventDefault();
-      setSearchTerm(e.target.value);
+      e.preventDefault()
+      setSearchTerm(e.target.value)
     }
 
     const nextPage = async (pageNumber: number) => {
@@ -156,12 +130,12 @@ export default function HomePage() {
           `https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&query=${searchTerm}&page=${pageNumber}`
         );
         const data = await response.json();
-        setMovies(data.results); // Set new movies, replacing old ones
-        setCurrentPage(pageNumber);
+        setMovies(data.results) // Set new movies, replacing old ones
+        setCurrentPage(pageNumber)
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error("Error fetching data:", error)
       }
-    };
+    }
     
       if (loading) {
         return <Loading/>
@@ -195,6 +169,7 @@ export default function HomePage() {
         </div>
     )
 }
+
 
 
 //sub components

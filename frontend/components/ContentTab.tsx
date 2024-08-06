@@ -20,7 +20,6 @@ import MovieItem from "./MovieItem"
 import { Skeleton } from "./ui/skeleton"
 import { ContentTabProps, Movie } from "@/types/types"
 
-
 export function ContentTab({
   userId, 
   watchlist,

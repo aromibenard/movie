@@ -71,4 +71,13 @@ export interface SearchBarProps {
     handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     handleSubmit: (e: React.FormEvent) => void;
 } 
+
+export interface AuthContextTypes {
+    user: User | null
+    loading?: boolean
+    userName: string
+    photoURL: string
+    userId: string
+    watchlist: []
+}
   
