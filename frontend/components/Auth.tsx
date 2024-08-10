@@ -5,7 +5,10 @@ import { AuthContextTypes } from "@/types/types"
 import { onAuthStateChanged, User } from "firebase/auth"
 import { collection, getDocs } from "firebase/firestore"
 import { useRouter } from "next/navigation"
-import { createContext, ReactNode, useContext, useEffect, useState } from "react"
+import { createContext, 
+    ReactNode, useContext, 
+    useEffect, useState 
+} from "react"
 
 const AuthContext = createContext<AuthContextTypes | undefined >(undefined) 
 
