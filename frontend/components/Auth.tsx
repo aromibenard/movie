@@ -5,9 +5,12 @@ import { AuthContextTypes } from "@/types/types"
 import { onAuthStateChanged, User } from "firebase/auth"
 import { collection, getDocs } from "firebase/firestore"
 import { useRouter } from "next/navigation"
-import { createContext, 
-    ReactNode, useContext, 
-    useEffect, useState 
+import { 
+    createContext, 
+    ReactNode, 
+    useContext, 
+    useEffect, 
+    useState 
 } from "react"
 
 const AuthContext = createContext<AuthContextTypes | undefined >(undefined) 
@@ -17,6 +20,7 @@ export const AuthProvider = ({ children } : { children: ReactNode }) => {
     const [loading, setLoading] = useState(true)
     const [isLoading, setIsLoading] = useState(true)
     const [userName, setUserName] = useState('')
+    const[email, setEmail] = useState('')
     const [photoURL, setPhotoURL] = useState('')
     const [user, setUser] = useState<User | null>(null)
     const [userId, setUserId] = useState<string>('')
@@ -44,6 +48,7 @@ export const AuthProvider = ({ children } : { children: ReactNode }) => {
                 setUserId(uid)
                 setUserName(user!.displayName!)
                 setPhotoURL(user?.photoURL || '')
+                setEmail(user?.email || '')
                 setIsLoading(true)
                 await fetchWatchlist(user!.uid) 
             } else { 
@@ -59,8 +64,13 @@ export const AuthProvider = ({ children } : { children: ReactNode }) => {
 
     return (
         <AuthContext.Provider value ={{
-            photoURL, userId, user, 
-            userName, loading, watchlist 
+            photoURL, 
+            userId, 
+            user, 
+            userName, 
+            loading,
+            email, 
+            watchlist,  
         }}>
             {children}
         </AuthContext.Provider>

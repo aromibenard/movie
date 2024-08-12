@@ -9,7 +9,7 @@ import clsx from "clsx"
 import { DesktopIcon, GlobeIcon, PersonIcon } from "@radix-ui/react-icons"
 
 export default function ProfileSideBar() {
-    const {user, userId, userName, photoURL, loading} = useAuth()
+    const {user, userName, photoURL} = useAuth()
     const pathname = usePathname()
 
     return (
@@ -47,7 +47,7 @@ export default function ProfileSideBar() {
                     </Link>
                     <Link href={'/profile/watchlist'}
                         className= {clsx(
-                            'my-1 flex h-[48px] grow items-center justify-center gap-2 rounded-md  p-3 text-sm font-medium  hover:text-sky-500 md:flex-none  transition md:p-2 md:px-3',
+                            'my-0.5 flex h-[48px] grow items-center justify-center gap-2 rounded-md  p-3 text-sm font-medium  hover:text-sky-500 md:flex-none  transition md:p-2 md:px-3',
                             {
                               ' text-sky-500': pathname === '/profile/watchlist',
                             },
