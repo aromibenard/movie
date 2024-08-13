@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dialog"
 import { Button, Input } from "@mui/material"
 import { 
+    ArrowLeftIcon,
     BellIcon, 
     EnvelopeClosedIcon, 
     Pencil2Icon, 
@@ -20,6 +21,8 @@ import {
 import { Label } from "@/components/ui/label"
 import { Suspense } from "react"
 import MiniLoader from "@/components/MiniLoader"
+import Link from "next/link"
+import { buttonVariants } from "@/components/ui/button"
 
 export default function Profile() {
     const {
@@ -93,6 +96,10 @@ export default function Profile() {
                     </Suspense>
                 </div>           
             </div>
+            <Link href={'/home'} 
+                className={`hover:text-sky-500 transition ${buttonVariants({variant: 'outline'})}`}>
+                    <ArrowLeftIcon className="mx-1"/>Home
+            </Link>
         </div>
     )
 }
