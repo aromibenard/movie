@@ -78,6 +78,7 @@ export interface AuthContextTypes {
     userName: string
     photoURL: string
     userId: string
+    email:string
     watchlist: []
 }
   
