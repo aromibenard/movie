@@ -1,7 +1,6 @@
 'use client'
 
 import { useAuth } from "@/components/Auth"
-import Loading from "@/components/Loading"
 import { 
     Dialog, 
     DialogContent, 
@@ -19,13 +18,17 @@ import {
     RowsIcon 
 } from "@radix-ui/react-icons"
 import { Label } from "@/components/ui/label"
+import { Suspense } from "react"
+import MiniLoader from "@/components/MiniLoader"
 
 export default function Profile() {
-    const {user, userId, userName, photoURL, loading, email} = useAuth()
-
-    if (loading) {
-        return <Loading/>
-    }
+    const {
+        user, 
+        userId, 
+        userName, 
+        photoURL, 
+        email
+    } = useAuth()
 
     return (
         <div className="h-full w-full bg-slate-50 p-10">
@@ -79,13 +82,38 @@ export default function Profile() {
                 </div>
                 <div>
                     <h1 className="font-semibold text-gray-600 text-md">Username:</h1>
-                    <p className="flex items-center text-sm text-gray-500 hover:text-sky-400 hover:cursor-pointer transition">{userName}</p>
+                    <Suspense fallback={<MiniLoader/>}>
+                        <UsersName userName={userName}/>
+                    </Suspense>
                 </div>
                 <div>
                     <h1 className="font-semibold text-gray-600 text-md">Email:</h1>
-                    <p className="flex items-center text-sm text-gray-500 hover:text-sky-400 hover:cursor-pointer transition">{email}</p>
+                    <Suspense fallback={<MiniLoader/>}>
+                        <UsersEmail email={email}/>
+                    </Suspense>
                 </div>           
             </div>
         </div>
     )
 }
+
+interface ComponentProps {
+    email?: string
+    userName?: string
+}
+
+const UsersEmail = ({email}:ComponentProps) => {
+   return (
+    <p className="flex items-center text-sm text-gray-500 hover:text-sky-400 hover:cursor-pointer transition">
+        {email}
+    </p>
+   ) 
+}
+
+const UsersName = ({userName}: ComponentProps) => {
+    return (
+     <p className="flex items-center text-sm text-gray-500 hover:text-sky-400 hover:cursor-pointer transition">
+         {userName}
+     </p>
+    ) 
+ }

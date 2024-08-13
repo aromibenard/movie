@@ -20,7 +20,7 @@ export const AuthProvider = ({ children } : { children: ReactNode }) => {
     const [loading, setLoading] = useState(true)
     const [isLoading, setIsLoading] = useState(true)
     const [userName, setUserName] = useState('')
-    const[email, setEmail] = useState('')
+    const [email, setEmail] = useState('')
     const [photoURL, setPhotoURL] = useState('')
     const [user, setUser] = useState<User | null>(null)
     const [userId, setUserId] = useState<string>('')

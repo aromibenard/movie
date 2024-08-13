@@ -16,3 +16,4 @@ export async function addToWatchlist(formData: FormData) {
         return { success: false, error: 'Failed to add movie'}
     }
 }
+
